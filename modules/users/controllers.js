@@ -15,15 +15,19 @@ module.exports = {
 	},
 
 	create: async (req, res) => {
-		const { name, email, phone_number, gender } = req.body;
+		const { name, email, phone_number, gender, password } = req.body;
 
 		const [{ dataValues }, isCreated] = await Users.findOrCreate({
-			where: { email },
-			defaults: { name, phone_number, gender }
+			where: { email }, defaults: {
+				name,
+				phone_number,
+				gender,
+				password: Users.hashPassword(password)
+			}
 		});
 
 		return isCreated
-			? res.status(201).json(responseApi(null, 201, 'User Created', dataValues))
+			? res.status(201).json(responseApi(null, 201, 'User Created', { name, email, phone_number, gender }))
 			: res.status(422).json(responseApi(false, 422, 'Email is already exist'));
 	},
 
