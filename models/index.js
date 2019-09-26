@@ -27,7 +27,11 @@ fs.readdirSync(__dirname)
   })
   .forEach(file => {
     const model = sequelize['import'](path.join(__dirname, file))
-    db[model.name] = model
+    /*
+      @desc     Convert model name to capitalize
+      @sample   'users' to 'Users'
+    */
+    db[model.name.replace(/\b[a-z]/gi, char => char.toUpperCase())] = model
   })
 
 Object.keys(db).forEach(modelName => {

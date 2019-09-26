@@ -1,24 +1,46 @@
 const axios = require('axios')
-const { users } = require('../../models')
+const { Users } = require('../../models')
 
 module.exports = {
 	get: async (req, res) => {
-		const users = await users.findAll()
-		if (users.length === 0) {
+		const data = await Users.findAll()
+		if (data.length === 0)
 			res.json({
 				status: false,
+				code: 200,
 				message: 'Empty',
-				data: users.data || users
+				data: data.data || data
 			})
-		}
-		res.json({
-			status: true,
-			message: 'Success',
-			data: users.data || users
-		})
+		else
+			res.json({
+				status: true,
+				message: 'Success',
+				data: data.data || data
+			})
 	},
 
 	create: async (req, res) => {
-		res.send('Ok')
+		const { name, email, phone_number, gender } = req.body
+		const data = await Users.create({ name, email, phone_number, gender })
+		res.json({
+			status: true,
+			code: 200,
+			message: 'Success',
+			data
+		})
+	},
+
+	update: async (req, res) => {
+		const { name, email, phone_number, gender } = req.body
+		const data = await Users.update(
+			{ name, email, phone_number, gender },
+			{ where: { id: req.params.id } }
+		)
+		res.json({
+			status: true,
+			code: 200,
+			message: 'Success to update user',
+			data: { name, email, phone_number, gender }
+		})
 	}
 }
