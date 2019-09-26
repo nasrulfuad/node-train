@@ -5,9 +5,9 @@ const { responseApi } = require('../../core/helpers');
 module.exports = {
 	get: async (req, res) => {
 		const data = await Users.findAndCountAll();
-		data.length === 0
-			? res.json(responseApi(false, null, 'Empty', data.data || data))
-			: res.json(responseApi(true, null, null, data.data || data));
+		data.rows.length === 0
+			? res.json(responseApi(false, null, 'Empty', data.rows))
+			: res.json(responseApi(true, null, null, data));
 	},
 
 	create: async (req, res) => {
@@ -22,11 +22,8 @@ module.exports = {
 			{ name, email, phone_number, gender },
 			{ where: { id: req.params.id } }
 		);
-		res.json({
-			status: true,
-			code: 200,
-			message: 'Success to update user',
-			data: { name, email, phone_number, gender }
-		});
-	}
+		res.json(responseApi(null, null, 'User Updated'));
+	},
+
+	remove: async (req, res) => {}
 };
