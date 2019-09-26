@@ -1,5 +1,5 @@
-const Sequelize = require('sequelize')
-require('./env')
+const Sequelize = require('sequelize');
+require('./env');
 
 module.exports = new Sequelize(
     process.env.SEQUELIZE_DATABASE,
@@ -14,4 +14,4 @@ module.exports = new Sequelize(
             hooks: {}
         }
     }
-)
+);
