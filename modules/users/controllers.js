@@ -1,14 +1,16 @@
 const axios = require('axios');
 const { Users } = require('../../models');
 const { responseApi } = require('../../core/helpers');
-const { getAllAndPagination } = require('../common');
+const { getAllAndPagination } = require('../../core/common');
 
 module.exports = {
 	get: async (req, res) => {
-		const data = await getAllAndPagination(Users, req.query);
+		const data = await getAllAndPagination(Users, req.query, {
+			attributes: { exclude: ['updatedAt', 'password'] }
+		});
 
 		data.totalRows === 0
-			? res.json(responseApi(false, null, 'Empty', data.rows))
+			? res.json(responseApi(false, null, 'User is empty', data.rows))
 			: res.json(responseApi(true, null, null, data));
 	},
 
