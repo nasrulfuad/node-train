@@ -1,34 +1,33 @@
 const router = require('express').Router();
-const { get, create, update } = require('./controllers');
-
-const wrap = fn => (req, res, next) => {
-  try {
-    const result = fn(req, res, next);
-    return result.catch(next);
-  } catch (err) {
-    return next(err);
-  }
-};
+const { get, create, update, remove } = require('./controllers');
+const { errHandler } = require('../../core/helpers');
 
 /*
   @route    GET /users
   @desc     Get all users
   @access   Public
 */
-router.get('/', wrap(get));
+router.get('/', errHandler(get));
 
 /*
   @route    POST /users
   @desc     Create new user
   @access   Public
 */
-router.post('/', wrap(create));
+router.post('/', errHandler(create));
 
 /*
-  @route    PUT /users
+  @route    PUT /users/:id
   @desc     Update user
   @access   Public
 */
-router.put('/:id', wrap(update));
+router.put('/:id', errHandler(update));
+
+/*
+  @route    DELETE /users/:id
+  @desc     Delete user
+  @access   Public
+*/
+router.delete('/:id', errHandler(remove));
 
 module.exports = router;
