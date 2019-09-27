@@ -1,6 +1,7 @@
 const { User } = require('../../models');
 const { responseApi } = require('../../core/helpers');
-const { getAllAndPagination } = require('../../core/common');
+const { getAllAndPagination, validation } = require('../../core/common');
+const { createRules } = require('./validationRules')
 
 module.exports = {
 	get: async (req, res) => {
@@ -15,6 +16,12 @@ module.exports = {
 
 	create: async (req, res) => {
 		const { name, email, phone_number, gender, password } = req.body;
+		const errors = validation(req.body, createRules)
+
+		if (errors) return res.json(responseApi(false, 422, {
+			status: 'Validation Errors',
+			text: errors
+		}, req.body))
 
 		const [{ dataValues }, isCreated] = await User.findOrCreate({
 			where: { email }, defaults: {
@@ -24,9 +31,9 @@ module.exports = {
 				password: User.hashPassword(password)
 			}
 		});
-
+		dataValues.password = undefined
 		return isCreated
-			? res.status(201).json(responseApi(null, 201, 'User Created', { name, email, phone_number, gender }))
+			? res.status(201).json(responseApi(null, 201, 'User Created', dataValues))
 			: res.status(422).json(responseApi(false, 422, 'Email is already exist'));
 	},
 

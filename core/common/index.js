@@ -1,11 +1,17 @@
+const validate = require('validate.js')
+
 module.exports = {
+	/*
+		@desc  function helper for adding paginate
+	*/
 	getAllAndPagination: async (model, q, option) => {
 		const page = parseInt(q.page) || 1;
 		const limit = parseInt(q.limit) || 10;
-		let no = (page - 1) * limit;
+		const startIndex = (page - 1) * limit;
+		let no = startIndex;
 
 		let options = {
-			offset: (page - 1) * limit,
+			offset: startIndex,
 			limit,
 			order: [['createdAt', 'DESC']]
 		};
@@ -13,6 +19,9 @@ module.exports = {
 		if (option) options = { ...options, ...option };
 		let { count, rows } = await model.findAndCountAll(options);
 
+		/*
+			Adding number every rows
+		*/
 		rows = rows.map(r => {
 			r.dataValues.number = ++no;
 			Object.keys(r).forEach(d => {
@@ -21,8 +30,8 @@ module.exports = {
 			return r;
 		});
 
-		let previous = (options.offset > 0) ? { page: page - 1, limit} : undefined;
-		let next = ((page * limit) < count) ? { page: page + 1 , limit } : undefined;
+		const previous = (startIndex > 0) ? { page: page - 1, limit} : undefined;
+		const next = ((page * limit) < count) ? { page: page + 1 , limit } : undefined;
 
 		return {
 			totalDatas: count,
@@ -32,5 +41,10 @@ module.exports = {
 			previous,
 			rows
 		};
-	}
+	},
+
+
+
+
+	validation: (attributes, constraint) => validate(attributes, constraint)
 };
