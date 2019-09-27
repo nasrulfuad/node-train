@@ -20,18 +20,14 @@ switch (process.env.NODE_ENV) {
 const sequelize = new Sequelize(mode);
 
 fs.readdirSync(__dirname)
-  .filter(file => {
-    return (
-      file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js'
-    );
-  })
+  .filter(file => file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js')
   .forEach(file => {
     const model = sequelize['import'](path.join(__dirname, file));
     /*
-      @desc     Convert model name to capitalize
-      @sample   'users' to 'Users'
+      @desc     Convert model name to capitalize and remove 's' at the end word
+      @sample   'users' to 'User'
     */
-    db[model.name.replace(/\b[a-z]/gi, char => char.toUpperCase())] = model;
+    db[model.name.replace(/\b[a-z]/gi, char => char.toUpperCase()).slice(0,-1)] = model;
   });
 
 Object.keys(db).forEach(modelName => {

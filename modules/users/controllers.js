@@ -1,11 +1,10 @@
-const axios = require('axios');
-const { Users } = require('../../models');
+const { User } = require('../../models');
 const { responseApi } = require('../../core/helpers');
 const { getAllAndPagination } = require('../../core/common');
 
 module.exports = {
 	get: async (req, res) => {
-		const data = await getAllAndPagination(Users, req.query, {
+		const data = await getAllAndPagination(User, req.query, {
 			attributes: { exclude: ['updatedAt', 'password'] }
 		});
 
@@ -17,12 +16,12 @@ module.exports = {
 	create: async (req, res) => {
 		const { name, email, phone_number, gender, password } = req.body;
 
-		const [{ dataValues }, isCreated] = await Users.findOrCreate({
+		const [{ dataValues }, isCreated] = await User.findOrCreate({
 			where: { email }, defaults: {
 				name,
 				phone_number,
 				gender,
-				password: Users.hashPassword(password)
+				password: User.hashPassword(password)
 			}
 		});
 
@@ -35,7 +34,7 @@ module.exports = {
 		const { name, email, phone_number, gender } = req.body;
 		const { id } = req.params;
 
-		const [isUpdated] = await Users.update(
+		const [isUpdated] = await User.update(
 			{ name, email, phone_number, gender },
 			{ where: { id } }
 		);
@@ -47,7 +46,7 @@ module.exports = {
 
 	remove: async (req, res) => {
 		const { id } = req.params;
-		const isDeleted = await Users.destroy({ where: { id } });
+		const isDeleted = await User.destroy({ where: { id } });
 
 		return isDeleted
 			? res.json(responseApi(null, null, 'User Deleted'))

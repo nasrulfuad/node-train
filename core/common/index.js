@@ -21,11 +21,15 @@ module.exports = {
 			return r;
 		});
 
+		let previous = (options.offset > 0) ? { page: page - 1, limit} : undefined;
+		let next = ((page * limit) < count) ? { page: page + 1 , limit } : undefined;
+
 		return {
-			totalPage: Math.ceil(count / limit),
-			totalData: count,
-			totalRows: rows.length,
-			page,
+			totalDatas: count,
+			totalPages: Math.ceil(count / limit),
+			cuurentPage: page,
+			next,
+			previous,
 			rows
 		};
 	}
