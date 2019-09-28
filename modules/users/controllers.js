@@ -18,19 +18,12 @@ module.exports = {
 		const { name, email, phone_number, gender, password } = req.body;
 		const errors = validation(req.body, createRules)
 
-		if (errors) return res.json(responseApi(false, 422, {
-			status: 'Validation Errors',
-			text: errors
-		}, req.body))
+		if (errors) return res.status(422).json(responseApi(false, 422, { status: 'Validation Error', text: errors }, req.body))
 
-		const [{ dataValues }, isCreated] = await User.findOrCreate({
-			where: { email }, defaults: {
-				name,
-				phone_number,
-				gender,
-				password: User.hashPassword(password)
-			}
+		const [{ dataValues }, isCreated] = await User.findOrCreate({ 
+			where: { email }, defaults: { name, phone_number, gender, password: User.hashPassword(password) }
 		});
+
 		dataValues.password = undefined
 		return isCreated
 			? res.status(201).json(responseApi(null, 201, 'User Created', dataValues))
