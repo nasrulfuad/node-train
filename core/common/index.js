@@ -37,14 +37,9 @@ module.exports = {
 			totalDatas: count,
 			totalPages: Math.ceil(count / limit),
 			cuurentPage: page,
-			next,
-			previous,
-			rows
+			next, previous, rows
 		};
 	},
-
-
-
 
 	validation: (attributes, constraint) => validate(attributes, constraint)
 };
