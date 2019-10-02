@@ -1,15 +1,30 @@
-const { Users, Profiles, Story } = require('../../models');
+const { Users, Profiles, Story, Reviews } = require('../../models');
 const { responseApi } = require('../../core/helpers');
 const { getAllAndPagination, validation } = require('../../core/common');
-const { createRules } = require('./validationRules')
+const { createRules } = require('./validationRules');
 
 module.exports = {
 	get: async (req, res) => {
 		const data = await getAllAndPagination(Users, req.query, {
 			attributes: { exclude: ['updatedAt', 'password'] },
 			include: [
-				{ model: Profiles, attributes: { exclude: ['updatedAt', 'createdAt'] } },
-				{ model: Story, attributes: { exclude: ['updatedAt', 'createdAt', 'authorId'] } },
+				{
+					model: Profiles,
+					attributes: { exclude: ['updatedAt', 'createdAt'] }
+				},
+				{
+					model: Story,
+					attributes: {
+						exclude: ['updatedAt', 'createdAt', 'authorId']
+					}
+				},
+				{
+					model: Reviews,
+					attributes: {
+						exclude: ['updatedAt', 'createdAt']
+					},
+					include: [Story]
+				}
 			]
 		});
 
@@ -20,18 +35,38 @@ module.exports = {
 
 	create: async (req, res) => {
 		const { name, email, phone_number, gender, password } = req.body;
-		const errors = validation(req.body, createRules)
+		const errors = validation(req.body, createRules);
 
-		if (errors) return res.status(422).json(responseApi(false, 422, { status: 'Validation Error', text: errors }, req.body))
+		if (errors)
+			return res
+				.status(422)
+				.json(
+					responseApi(
+						false,
+						422,
+						{ status: 'Validation Error', text: errors },
+						req.body
+					)
+				);
 
-		const [{ dataValues }, isCreated] = await Users.findOrCreate({ 
-			where: { email }, defaults: { name, phone_number, gender, password: Users.hashPassword(password) }
+		const [{ dataValues }, isCreated] = await Users.findOrCreate({
+			where: { email },
+			defaults: {
+				name,
+				phone_number,
+				gender,
+				password: Users.hashPassword(password)
+			}
 		});
 
-		dataValues.password = undefined
+		dataValues.password = undefined;
 		return isCreated
-			? res.status(201).json(responseApi(null, 201, 'User Created', dataValues))
-			: res.status(422).json(responseApi(false, 422, 'Email is already exist'));
+			? res
+					.status(201)
+					.json(responseApi(null, 201, 'User Created', dataValues))
+			: res
+					.status(422)
+					.json(responseApi(false, 422, 'Email is already exist'));
 	},
 
 	update: async (req, res) => {
