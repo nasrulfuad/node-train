@@ -12,10 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         {}
     );
 
-    profiles.associate = function(models) {
-        // associations can be defined here
-        profiles.belongsTo(models.User)
-    };
+    profiles.associate = models => profiles.belongsTo(models.Users);
 
     return profiles;
 };

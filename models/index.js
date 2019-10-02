@@ -27,7 +27,7 @@ fs.readdirSync(__dirname)
           @desc     Convert model name to capitalize and remove 's' at the end word
           @sample   'users' to 'User'
         */
-        db[model.name.replace(/\b[a-z]/gi, char => char.toUpperCase()).slice(0,-1)] = model;
+        db[model.name.replace(/\b[a-z]/gi, char => char.toUpperCase())] = model;
     });
 
 Object.keys(db).forEach(modelName => {
@@ -36,17 +36,37 @@ Object.keys(db).forEach(modelName => {
     }
 });
 
-(async function() {
-    await sequelize.sync({ force: true })
-    const password = await db.User.hashPassword('password')
-    const [one, two] = await Promise.all([
-        db.User.create({ name: 'Dianna Sherman', email: 'diannasherman@pharmacon.com', password, phone_number: '+62 (981) 562-3776', gender: 0 }),
-        db.User.create({ name: 'Mollie Cardenas', email: 'molliecardenas@pharmacon.com', password, phone_number: '+62 (915) 551-2414', gender: 0 })
-    ])
+// (async function() {
+//     await sequelize.sync({ force: true });
+//     const password = await db.Users.hashPassword('password');
+//     const [one, two, three] = await Promise.all([
+//         db.Users.create({ name: 'Dianna Sherman', email: 'diannasherman@pharmacon.com', password, phone_number: '+62 (981) 562-3776', gender: 0 }),
+//         db.Users.create({ name: 'Mollie Cardenas', email: 'molliecardenas@pharmacon.com', password, phone_number: '+62 (915) 551-2414', gender: 0 }),
+//         db.Users.create({ name: 'Nichols Valentine', email: 'nicholsvalentine@pharmacon.com', password, phone_number: '+62 (807) 454-3515', gender: 1 })
+//     ]);
 
-    await db.Profile.create({ userId: one.id, address: 'usa' })
-    await db.Profile.create({ userId: two.id, address: 'usa' })
-})()
+//     await db.Profiles.create({ userId: one.id, address: 'usa' });
+//     await db.Profiles.create({ userId: two.id, address: 'au' });
+//     await db.Profiles.create({ userId: three.id, address: 'brn' });
+
+//     const stories = [
+//         { title: 'Node is great', authorId: one.id },
+//         { title: 'I love Sequelize', authorId: two.id },
+//         { title: 'Javascript Rocks', authorId: two.id }
+//     ];
+
+//     const [nodeStory, seqStory, jsStory] = await Promise.all(stories.map(story => db.Story.create(story)));
+
+//     const reviews = [
+//         { reviewerId: one.id, storyId: nodeStory.id, rating: 4.5 },
+//         { reviewerId: three.id, storyId: nodeStory.id, rating: 3.5 }
+//     ];
+
+//     const [oneReview, threeReview] = await Promise.all(reviews.map(review => db.Reviews.create(review)));
+
+//     const data = await db.Users.findAll({ include: [db.Story] })
+//     console.log(data[0].get())
+// })();
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

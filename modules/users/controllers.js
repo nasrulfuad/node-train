@@ -1,12 +1,16 @@
-const { User } = require('../../models');
+const { Users, Profiles, Story } = require('../../models');
 const { responseApi } = require('../../core/helpers');
 const { getAllAndPagination, validation } = require('../../core/common');
 const { createRules } = require('./validationRules')
 
 module.exports = {
 	get: async (req, res) => {
-		const data = await getAllAndPagination(User, req.query, {
-			attributes: { exclude: ['updatedAt', 'password'] }
+		const data = await getAllAndPagination(Users, req.query, {
+			attributes: { exclude: ['updatedAt', 'password'] },
+			include: [
+				{ model: Profiles, attributes: { exclude: ['updatedAt', 'createdAt'] } },
+				{ model: Story, attributes: { exclude: ['updatedAt', 'createdAt', 'authorId'] } },
+			]
 		});
 
 		data.totalRows === 0
@@ -20,8 +24,8 @@ module.exports = {
 
 		if (errors) return res.status(422).json(responseApi(false, 422, { status: 'Validation Error', text: errors }, req.body))
 
-		const [{ dataValues }, isCreated] = await User.findOrCreate({ 
-			where: { email }, defaults: { name, phone_number, gender, password: User.hashPassword(password) }
+		const [{ dataValues }, isCreated] = await Users.findOrCreate({ 
+			where: { email }, defaults: { name, phone_number, gender, password: Users.hashPassword(password) }
 		});
 
 		dataValues.password = undefined
@@ -34,7 +38,7 @@ module.exports = {
 		const { name, email, phone_number, gender } = req.body;
 		const { id } = req.params;
 
-		const [isUpdated] = await User.update(
+		const [isUpdated] = await Users.update(
 			{ name, email, phone_number, gender },
 			{ where: { id } }
 		);
@@ -46,7 +50,7 @@ module.exports = {
 
 	remove: async (req, res) => {
 		const { id } = req.params;
-		const isDeleted = await User.destroy({ where: { id } });
+		const isDeleted = await Users.destroy({ where: { id } });
 
 		return isDeleted
 			? res.json(responseApi(null, null, 'User Deleted'))
